@@ -20,11 +20,18 @@ const Party = mongoose.model("Party");
 
 
 
-app.get('/', async(req, res) => {
-  //  const places = await Places.find({});
-    console.log("Hello World!");
+app.get('/api/allparty', async(req, res) => {
+    const Party1 = await Party.find({});
+    //console.log("Parties>>>>>>>>" ,places);
         
-   // res.send();
+    res.send({Party1});
+})
+
+app.get('/api/allvoter', async(req, res) => {
+    const voters = await Voter.find({});
+    //console.log("Parties>>>>>>>>" ,places);
+        
+    res.send({voters});
 })
 
 // app.post('/api/vote',async(req,res)=>{
