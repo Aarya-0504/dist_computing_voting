@@ -1,13 +1,15 @@
-const grpc = require('grpc');
-const protoLoader = require('@grpc/proto-loader');
-const mongoose = require('mongoose');
+const protoLoader = require("./node_modules/@grpc/proto-loader");
+const grpc = require("./node_modules/@grpc/grpc-js");
 
+// const PROTO_PATH = "./voting.proto";
+// var protoLoader = require("@grpc/proto-loader");
+
+const mongoose = require('mongoose');
 
 const Voter = require('./model/Voter');
 const Party = require('./model/Party');
 
 require('./db/connection');
-
 
 const PROTO_PATH = './voting.proto';
 
@@ -42,6 +44,11 @@ server.addService(VotingService.service, {
     }
 });
 
-server.bind('127.0.0.1:3035', grpc.ServerCredentials.createInsecure());
-console.log('Server running at 127.0.0.1:3035');
-server.start();
+server.bindAsync('127.0.0.1:3035', grpc.ServerCredentials.createInsecure(), (err, port) => {
+    if (err) {
+        console.error('Error starting server:', err);
+    } else {
+        console.log('Server running at 127.0.0.1:3035');
+        server.start();
+    }
+});
