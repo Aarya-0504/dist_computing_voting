@@ -9,15 +9,6 @@ const { VotingService } = grpcObject;
 
 
 const client = new VotingService('localhost:3030', grpc.credentials.createInsecure());
-const options = {
-    keepCase: true,
-    longs: String,
-    enums: String,
-    defaults: true,
-    oneofs: true,
-  };
-  
-// var packageDefinition = protoLoader.loadSync(PROTO_PATH, options);
 
   client.GetVoterList({}, (err, response) => {
         if (err) {
