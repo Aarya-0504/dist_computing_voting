@@ -1,10 +1,11 @@
-
+package example.hello;
+        
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
         
-public class Server{
+public class Server implements Hello {
         
     public Server() {}
 
@@ -16,10 +17,10 @@ public class Server{
         
         try {
             Server obj = new Server();
-            Hello stub = (Hello) UnicastRemoteObject.exportObject(obj, 0);
+            Hello stub = (Hello) UnicastRemoteObject.exportObject(obj, 2001);
 
             // Bind the remote object's stub in the registry
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.getRegistry(2001);
             registry.bind("Hello", stub);
 
             System.err.println("Server ready");
