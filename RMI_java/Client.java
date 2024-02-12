@@ -12,7 +12,7 @@ public class Client {
         // System.out.println(host);
         try {
             Registry registry = LocateRegistry.getRegistry(host);
-            Hello stub = (Hello) registry.lookup("Hello");
+            VotingInterface stub = (VotingInterface) registry.lookup("Hello");
 
             Scanner scanner = new Scanner(System.in);
 
