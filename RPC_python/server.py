@@ -28,7 +28,7 @@ class VotingSystem:
 def main():
     voting_system = VotingSystem()
     daemon = Pyro4.Daemon()
-    uri = daemon.register(voting_system)
+    uri = daemon.register(voting_system, objectId="example.voting_system")
     print("Server URI:", uri)
     daemon.requestLoop()
 

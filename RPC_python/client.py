@@ -1,6 +1,6 @@
 import Pyro4
 
-server_uri = "PYRO:obj_5e250205f23549f79f447a50b950f8cb@localhost:65257"
+server_uri = "PYRO:example.voting_system@localhost:5193"
 voting_system = Pyro4.Proxy(server_uri)
 
 def display_menu():
