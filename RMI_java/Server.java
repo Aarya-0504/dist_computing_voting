@@ -1,44 +1,51 @@
-// import java.rmi.registry.LocateRegistry;
-// import java.rmi.registry.Registry;
-
-// public class Server {
-//     public static void main(String[] args) {
-//         try {
-//             // Create and export the remote object
-//             HelloImpl obj = new HelloImpl();
-
-//             // Create RMI registry on port 3000
-//             Registry registry = LocateRegistry.createRegistry(3000);
-
-//             // Bind the remote object's stub in the registry
-//             registry.rebind("Hello", obj);
-
-//             System.out.println("RMI Server running on port 3000");
-//         } catch (Exception e) {
-//             System.err.println("Server exception: " + e.toString());
-//             e.printStackTrace();
-//         }
-//     }
-// }
-
-
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-        
-public class Server implements Hello {
-        
-    public Server() {}
+import java.util.*;
 
-    public String sayHello() {
-        return "Hello, world!";
+ class VotingSystem implements Hello{
+    private Set<String> voters;
+    private Map<String, Integer> parties;
+
+    public VotingSystem() {
+        this.voters = new HashSet<>();
+        this.parties = new HashMap<>();
     }
-        
+
+    public String register_voter(String voterId) {
+        voters.add(voterId);
+        return "Voter " + voterId + " registered successfully";
+    }
+    
+    public String register_party(String partyName) {
+        parties.put(partyName, 0);
+        return "Party " + partyName + " registered successfully";
+    }
+
+    public String vote(String voterId, String partyName) {
+        if (!voters.contains(voterId)) {
+            return "Voter not registered";
+        }
+        if (!parties.containsKey(partyName)) {
+            return "Party not registered";
+        }
+        parties.put(partyName, parties.get(partyName) + 1);
+        return "Vote cast for " + partyName + " successfully";
+    }
+
+    public Map<String, Integer> tally_votes() {
+        return parties;
+    }
+
+}
+
+public class Server {
+  
     public static void main(String args[]) {
         
         try {
-            Server obj = new Server();
+            VotingSystem obj = new VotingSystem();
             Hello stub = (Hello) UnicastRemoteObject.exportObject(obj, 0);
 
             // Bind the remote object's stub in the registry
