@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
- class VotingSystem implements Hello{
+ class VotingSystem implements VotingInterface{
     private Set<String> voters;
     private Map<String, Integer> parties;
 
@@ -40,13 +40,14 @@ import java.util.*;
 
 }
 
+
 public class Server {
   
     public static void main(String args[]) {
         
         try {
             VotingSystem obj = new VotingSystem();
-            Hello stub = (Hello) UnicastRemoteObject.exportObject(obj, 0);
+            VotingInterface stub = (VotingInterface) UnicastRemoteObject.exportObject(obj, 0);
 
             // Bind the remote object's stub in the registry
             Registry registry = LocateRegistry.getRegistry();

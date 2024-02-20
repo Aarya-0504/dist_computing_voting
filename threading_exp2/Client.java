@@ -5,7 +5,7 @@ import java.rmi.registry.Registry;
 import java.util.*;
 
 public class Client {
-
+    static String vId="";
     public static void main(String[] args) {
 
         String host = (args.length < 1) ? null : args[0];
@@ -24,6 +24,7 @@ public class Client {
                 System.out.println("2. Register Party");
                 System.out.println("3. Cast Vote");
                 System.out.println("4. Tally Votes");
+                System.out.println("5. Run continuously");
                 System.out.println("0. Exit");
                 System.out.println("-------------------------------");
 
@@ -34,6 +35,7 @@ public class Client {
                         System.out.print("Enter Voter ID: ");
                         String voterId = scanner.nextLine();
                         String response=stub.register_voter(voterId);
+                        vId=voterId;
                         System.out.println(response);
                         // stub("register_voter", Map.of("voter_id", voterId));
                         break;
@@ -52,7 +54,7 @@ public class Client {
                         String partyNameVote = scanner.nextLine();
                         response=stub.vote(voterIdVote,partyNameVote);
                         System.out.println(response);
-                        // stub("vote", Map.of("voter_id", voterIdVote, "party_name", partyNameVote));
+
                         break;
                     case "4":
                         Map<String, Integer> vote_tally =stub.tally_votes();
@@ -60,6 +62,23 @@ public class Client {
                         System.out.println(entry.getKey()+" : "+entry.getValue());
                         }
                         
+                        break;
+                    case "5":
+                        int i=0;
+                        String pName=scanner.nextLine();
+
+                        while(i<500){
+                            response=stub.vote(vId,pName);
+                            System.out.println(response);
+                            i++;
+
+                            try {
+                                Thread.sleep(100); // Sleep for 1 second (1000 milliseconds)
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                    
+                        }
                         break;
                     case "0":
                         System.out.println("Exiting...\n");

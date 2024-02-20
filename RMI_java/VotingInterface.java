@@ -2,7 +2,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
 
-public interface Hello extends Remote {
+public interface VotingInterface extends Remote {
     
     String register_party(String party_name) throws RemoteException;
     String register_voter(String voterId) throws RemoteException;

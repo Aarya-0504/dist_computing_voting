@@ -6,34 +6,6 @@ import java.util.*;
 import java.util.concurrent.*;
 
 
-public class Server {
-
-    public static void main(String args[]) {
-        try {
-            VotingSystem obj = new VotingSystem();
-            Hello stub = (Hello) UnicastRemoteObject.exportObject(obj, 0);
-
-            // Bind the remote object's stub in the registry
-            Registry registry = LocateRegistry.getRegistry();
-            registry.bind("Hello", stub);
-
-            System.err.println("Server ready");
-
-            // Create a thread pool to handle multiple client requests concurrently
-            ExecutorService executorService = Executors.newFixedThreadPool(10);
-
-            while (true) {
-                // Accept client connections and execute tasks concurrently
-                executorService.execute(() -> {
-                    // Handle client requests here
-                });
-            }
-        } catch (Exception e) {
-            System.err.println("Server exception: " + e.toString());
-            e.printStackTrace();
-        }
-    }
-}
 
 class VotingSystem implements Hello {
     private Set<String> voters;
@@ -72,9 +44,11 @@ class VotingSystem implements Hello {
                 return "Party not registered";
             }
             parties.put(partyName, parties.get(partyName) + 1);
+            // return tally_votes();
         }
-
-        return "Vote cast for " + partyName + " successfully";
+        
+        System.out.println("Vote cast for " + partyName + " successfully"+" from "+voterId);
+        return "Vote cast for " + partyName + " successfully"+" from "+voterId;
     }
 
     public Map<String, Integer> tally_votes() {
@@ -83,3 +57,31 @@ class VotingSystem implements Hello {
 }
 
 
+public class Server {
+
+    public static void main(String args[]) {
+        try {
+            VotingSystem obj = new VotingSystem();
+            Hello stub = (Hello) UnicastRemoteObject.exportObject(obj, 0);
+
+            // Bind the remote object's stub in the registry
+            Registry registry = LocateRegistry.getRegistry();
+            registry.bind("Hello", stub);
+
+            System.err.println("Server ready");
+
+            // Create a thread pool to handle multiple client requests concurrently
+            ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+            while (true) {
+                // Accept client connections and execute tasks concurrently
+                executorService.execute(() -> {
+                    // Handle client requests here
+                });
+            }
+        } catch (Exception e) {
+            System.err.println("Server exception: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+}
