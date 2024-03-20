@@ -6,7 +6,6 @@
 1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
 2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
 */
-
 *,
 ::before,
 ::after {
@@ -911,9 +910,27 @@ video {
   background-color: rgb(239 68 68 / var(--tw-bg-opacity));
 }
 
+.bg-customBlue-400{
+  /* --tw-bg-opacity: 1; */
+  background-color:rgb(83, 86, 255 );
+}
+
+.bg-customBlue-300{
+  --tw-bg-opacity: 1;
+  background-color:rgb(55, 140, 231 );
+}
+.bg-customBlue-200{
+  --tw-bg-opacity: 1;
+  background-color:rgb(103, 198, 227);
+}
+.bg-customBlue-100{
+  --tw-bg-opacity: 1;
+  background-color:rgb(223, 245, 255);
+}
 .bg-cover {
   background-size: cover;
 }
+
 
 .bg-contain {
   background-size: contain;

@@ -1,13 +1,18 @@
 import './App.css'
 import HomePage from './pages/HomePage/HomePage'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 
 function App() {
 
   return (
     <>
-    <div className='bg-blue-600'>
-    <HomePage />
-    </div>
+    <BrowserRouter>
+    <Routes>
+        <Route path="/"  element={<HomePage />}/> 
+        <Route path="/vote"  element={<HomePage />}/> 
+    </Routes>
+    </BrowserRouter>
     </>
   )
 }
