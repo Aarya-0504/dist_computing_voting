@@ -1,15 +1,15 @@
 import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
 import './input.css'
-import Home from './components/Home.jsx'
-
 
 function App() {
+  const [count, setCount] = useState(0)
 
   return (
-    <>  
-    <div className="bg-slate-700">
+    <>
+    <div className='bg-green-500 text-teal-500'>
     hello
-    <Home/>
     </div>
     </>
   )

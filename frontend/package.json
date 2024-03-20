@@ -12,12 +12,9 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
-    "@mui/material": "^5.15.13",
-    "@mui/styled-engine-sc": "^6.0.0-alpha.17",
+    "@mui/material": "^5.15.14",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "styled-components": "^6.1.8",
-    "tailwind": "^4.0.0"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.64",
