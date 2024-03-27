@@ -1,5 +1,6 @@
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.time.Instant;
 // import java.util.HashMap;
 // import java.util.Map;
 import java.util.*;
@@ -14,9 +15,20 @@ public class Client {
             Registry registry = LocateRegistry.getRegistry(host);
             VotingInterface stub = (VotingInterface) registry.lookup("Hello");
 
+            // Get the server time
+            Instant serverTime = stub.getServerTime();
+            Instant clientTimeBeforeSync = Instant.now();
+            System.out.print("Client start at time: "+clientTimeBeforeSync);
+
+            // Calculate time difference
+            long timeDifferenceMillis = serverTime.toEpochMilli() - clientTimeBeforeSync.toEpochMilli();
+            System.out.print(" Time diff: "+timeDifferenceMillis);
             Scanner scanner = new Scanner(System.in);
 
             while (true) {
+                // Synchronize client time after each iteration
+                Instant clientTime = Instant.now().plusMillis(timeDifferenceMillis);
+                System.out.println(" Client time adjusted to: "+clientTime);
                 System.out.println("\n-------------------------------");
                 System.out.println("Voting Machine");
                 System.out.println("-------------------------------");

@@ -2,6 +2,7 @@ import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.time.Instant;
 import java.util.*;
 
  class VotingSystem implements VotingInterface{
@@ -14,11 +15,17 @@ import java.util.*;
     }
 
     public String register_voter(String voterId) {
+        if(voters.contains(voterId)){
+            return "VoterId "+voterId+" exist registration unsuccesfull";
+        }
         voters.add(voterId);
         return "Voter " + voterId + " registered successfully";
     }
     
     public String register_party(String partyName) {
+        if(parties.containsKey(partyName)){
+            return "party "+partyName+" already registered";
+        }
         parties.put(partyName, 0);
         return "Party " + partyName + " registered successfully";
     }
@@ -31,6 +38,7 @@ import java.util.*;
             return "Party not registered";
         }
         parties.put(partyName, parties.get(partyName) + 1);
+        voters.remove(voterId);
         return "Vote cast for " + partyName + " successfully";
     }
 
@@ -38,6 +46,10 @@ import java.util.*;
         return parties;
     }
 
+     // Implement the getServerTime method
+    public Instant getServerTime() throws RemoteException {
+        return Instant.now();
+    }
 }
 
 
@@ -53,7 +65,10 @@ public class Server {
             Registry registry = LocateRegistry.getRegistry();
             registry.bind("Hello", stub);
 
-            System.err.println("Server ready");
+            // Synchronize server time
+            Instant serverTime = Instant.now();
+            //System.out.print()
+            System.err.print("Server ready at time: "+serverTime);
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
