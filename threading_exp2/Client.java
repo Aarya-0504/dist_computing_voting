@@ -16,6 +16,7 @@ public class Client {
 
             Scanner scanner = new Scanner(System.in);
 
+         
             while (true) {
                 System.out.println("\n-------------------------------");
                 System.out.println("Voting Machine");
@@ -96,4 +97,19 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+    // private static void startHTTPServer() throws Exception {
+    //     int port = 8000;
+    //     HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+        
+    //     // Registering different HTTP handler classes for different endpoints
+    //     // server.createContext("/register_voter", new RegisterVoterHandler());
+    //     // server.createContext("/register_party", new RegisterPartyHandler(votingSystem));
+    //     // server.createContext("/vote", new VoteHandler(votingSystem));
+    //     // server.createContext("/tally_votes", new TallyVotesHandler(votingSystem));
+        
+    //     server.setExecutor(null);
+    //     server.start();
+    //     System.out.println("HTTP Server started on port " + port);
+    // }
 }
