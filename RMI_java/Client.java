@@ -12,6 +12,7 @@ public class Client {
         String host = (args.length < 1) ? null : args[0];
         // System.out.println(host);
         try {
+            
             Registry registry = LocateRegistry.getRegistry(host);
             VotingInterface stub = (VotingInterface) registry.lookup("Hello");
 
