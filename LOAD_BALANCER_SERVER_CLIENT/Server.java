@@ -1,3 +1,4 @@
+// package LOAD_BALANCER_SERVER_CLIENT;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -60,46 +61,25 @@ class VotingSystem implements VotingInterface {
     }
 }
 
-public class Server {
-    public static void main(String[] args) {
-        // try {
-        //     // Create and export a load balancer
-        //     LoadBalancer loadBalancer = new LoadBalancer();
-        //     LoadBalancerInterface loadBalancerStub = (LoadBalancerInterface) UnicastRemoteObject.exportObject(loadBalancer, 0);
 
-        //     // Bind the load balancer stub in the registry
-
-        //     Registry loadBalancerRegistry = LocateRegistry.createRegistry(1098); // Port for load balancer
-        //     loadBalancerRegistry.bind("LoadBalancer", loadBalancerStub);
-
-        //     // Start multiple server instances
-        //     for (int i = 0; i < 3; i++) {
-
-        //         VotingSystem serverInstance = new VotingSystem();
-        //         VotingInterface serverStub = (VotingInterface) UnicastRemoteObject.exportObject(serverInstance, 0);
-        //         Registry serverRegistry = LocateRegistry.createRegistry(1100 + i); // Different ports for each server instance
-        //         serverRegistry.bind("Server" + i, serverStub);
-        //     }
-
-        //     System.err.println("Load Balancer and Servers ready.");
-        // } catch (Exception e) {
-        //     System.err.println("Server exception: " + e.toString());
-        //     e.printStackTrace();
-        // }
-
-        try {
-            // Create a single instance of VotingSystem
-            VotingSystem serverInstance = new VotingSystem();
-            VotingInterface serverStub = (VotingInterface) UnicastRemoteObject.exportObject(serverInstance, 0);
-            
-            // Bind the server stub in the registry
-            Registry serverRegistry = LocateRegistry.createRegistry(1100); // Port for the server
-            serverRegistry.bind("hello", serverStub);
-
-            System.err.println("Voting Server ready.");
-        } catch (Exception e) {
-            System.err.println("Server exception: " + e.toString());
-            e.printStackTrace();
+    public class Server {
+        public static void main(String[] args) {
+            try {
+                // Start multiple server instances
+                for (int i = 0; i < 3; i++) {
+                    System.out.println("hello");
+                    VotingSystem serverInstance = new VotingSystem();
+                    VotingInterface serverStub = (VotingInterface) UnicastRemoteObject.exportObject(serverInstance, 0);
+                    Registry serverRegistry = LocateRegistry.createRegistry(1100 + i);  // Different ports for each server instance 
+                    serverRegistry.bind("Server" + i, serverStub);
+                }
+    
+                System.err.println("Voting Servers ready.");
+            } catch (Exception e) {
+                System.err.println("Server exception: " + e.toString());
+                e.printStackTrace();
+            }
         }
     }
-}
+
+    

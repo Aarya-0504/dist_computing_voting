@@ -1,37 +1,27 @@
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.time.Instant;
-import java.util.*;
+import java.util.Map;
+import java.util.Scanner;
 
 public class Client {
 
     public static void main(String[] args) {
-
-        // Specify Ngrok forwarding URL and port
-        // String ngrokHost = "0.tcp.ap.ngrok.io:17648"; // Update with your Ngrok hostname or IP
-        // int ngrokPort = 1098;  // Update with your Ngrok port
-
         try {
+            Registry registry = LocateRegistry.getRegistry("localhost", 3000); // Connect to load balancer
+            LoadBalancerInterface loadBalancer = (LoadBalancerInterface) registry.lookup("LoadBalancer");
+            
+            String serverName = loadBalancer.getServerName();
 
-            // Connect to the Ngrok-hosted RMI server
-            Registry registry = LocateRegistry.getRegistry(1100);
+            System.out.println(serverName);
+            int port=(int)(serverName.charAt(serverName.length()-1)-'0')+1100;
+            Registry serverRegistry = LocateRegistry.getRegistry("localhost", port); // Connect to selected server
+            VotingInterface stub = (VotingInterface) serverRegistry.lookup(serverName);
 
-            VotingInterface stub = (VotingInterface) registry.lookup("Hello");
-
-            // Get the server time
-            Instant serverTime = stub.getServerTime();
-            Instant clientTimeBeforeSync = Instant.now();
-            System.out.print("Client start at time: " + clientTimeBeforeSync);
-
-            // Calculate time difference
-            long timeDifferenceMillis = serverTime.toEpochMilli() - clientTimeBeforeSync.toEpochMilli();
-            System.out.print(" Time diff: " + timeDifferenceMillis);
+            // Remaining client code remains the same...
             Scanner scanner = new Scanner(System.in);
 
             while (true) {
-                // Synchronize client time after each iteration
-                Instant clientTime = Instant.now().plusMillis(timeDifferenceMillis);
-                System.out.println(" Client time adjusted to: " + clientTime);
                 System.out.println("\n-------------------------------");
                 System.out.println("Voting Machine");
                 System.out.println("-------------------------------");
