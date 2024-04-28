@@ -12,9 +12,13 @@ public class Client {
             LoadBalancerInterface loadBalancer = (LoadBalancerInterface) registry.lookup("LoadBalancer");
             
             String serverName = loadBalancer.getServerName();
+            
+            String[] parts = serverName.split(" ");
+            int port = Integer.parseInt(parts[1]);
+            System.out.println("Port number: " + port);
 
-            System.out.println(serverName);
-            int port=(int)(serverName.charAt(serverName.length()-1)-'0')+1100;
+            // int port=(int)(serverName.charAt(serverName.length()-1)-'0')+1100;
+            
             Registry serverRegistry = LocateRegistry.getRegistry("localhost", port); // Connect to selected server
             VotingInterface stub = (VotingInterface) serverRegistry.lookup(serverName);
 

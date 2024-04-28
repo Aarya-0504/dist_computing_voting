@@ -1,15 +1,18 @@
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Random;
-
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoadBalancer implements LoadBalancerInterface {
-    private String[] serverNames = {"Server0", "Server1", "Server2"}; // Names of the servers
-    private Random random = new Random();
+    private List<String> serverNames; // Names of the servers
+    private int currentIndex; // Index of the last selected server
 
     public LoadBalancer() {
+        this.serverNames = new ArrayList<>();
+        this.currentIndex = 0;
+
         // Export load balancer object
         try {
             LoadBalancerInterface loadBalancerStub = (LoadBalancerInterface) UnicastRemoteObject.exportObject(this, 0);
@@ -23,8 +26,29 @@ public class LoadBalancer implements LoadBalancerInterface {
 
     @Override
     public String getServerName() {
-        // Randomly select a server
-        return serverNames[random.nextInt(serverNames.length)];
+        // No servers available
+        if (serverNames.isEmpty()) {
+            return null;
+        }
+        // Increment the index and wrap around if needed
+        currentIndex = (currentIndex + 1) % serverNames.size();
+        return serverNames.get(currentIndex);
+    }
+
+    @Override
+    public void addServer(String serverName) {
+        if (!serverNames.contains(serverName)) {
+            serverNames.add(serverName);
+            System.out.println("Server added: " + serverName);
+        }
+    }
+
+    @Override
+    public void removeServer(String serverName) {
+        if (serverNames.contains(serverName)) {
+            serverNames.remove(serverName);
+            System.out.println("Server removed: " + serverName);
+        }
     }
 
     public static void main(String[] args) {

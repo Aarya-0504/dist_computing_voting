@@ -62,24 +62,67 @@ class VotingSystem implements VotingInterface {
 }
 
 
-    public class Server {
-        public static void main(String[] args) {
-            try {
-                // Start multiple server instances
-                for (int i = 0; i < 3; i++) {
-                    System.out.println("hello");
-                    VotingSystem serverInstance = new VotingSystem();
-                    VotingInterface serverStub = (VotingInterface) UnicastRemoteObject.exportObject(serverInstance, 0);
-                    Registry serverRegistry = LocateRegistry.createRegistry(1100 + i);  // Different ports for each server instance 
-                    serverRegistry.bind("Server" + i, serverStub);
-                }
-    
-                System.err.println("Voting Servers ready.");
-            } catch (Exception e) {
-                System.err.println("Server exception: " + e.toString());
-                e.printStackTrace();
-            }
+public class Server {
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            System.err.println("Usage: java Server <port>");
+            System.exit(1);
+        }
+        
+        int port = Integer.parseInt(args[0]);
+
+        try {
+            VotingSystem serverInstance = new VotingSystem();
+            VotingInterface serverStub = (VotingInterface) UnicastRemoteObject.exportObject(serverInstance, 0);
+            Registry serverRegistry = LocateRegistry.createRegistry(port);
+            serverRegistry.bind("Server " + port, serverStub);
+
+            System.err.println("Voting Server on port " + port + " ready.");
+
+            // Update load balancer with new server details
+            updateLoadBalancer(port, true);
+        } catch (Exception e) {
+            System.err.println("Server exception: " + e.toString());
+            e.printStackTrace();
         }
     }
 
-    
+    private static void updateLoadBalancer(int port, boolean addServer) {
+        try {
+            // Locate the load balancer registry
+            Registry registry = LocateRegistry.getRegistry("localhost", 3000);
+
+            // Look up the load balancer
+            LoadBalancerInterface loadBalancer = (LoadBalancerInterface) registry.lookup("LoadBalancer");
+            
+            // Add or remove the server from the load balancer
+            if (addServer) {
+                loadBalancer.addServer("Server " + port);
+                System.out.println("Load Balancer updated with new server: Server" + port);
+            } else {
+                // System.out.println()
+                loadBalancer.removeServer("Server " + port);
+                System.out.println("Load Balancer removed server: Server" + port);
+            }
+        } catch (Exception e) {
+            System.err.println("Error updating load balancer: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Add a shutdown hook to notify the load balancer when the server is shut down
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            // System.out.println("sun.java.command: " + System.getProperty("sun.java.command"));
+            
+            String[] commandParts = System.getProperty("sun.java.command").split(" ");
+            int port=Integer.parseInt(commandParts[1]);
+            // for( String  str: commandParts)
+            //     System.out.println(str);
+
+            System.out.println("Closing server at port : " + port);
+
+            updateLoadBalancer(port, false);
+        }));
+    }
+}
