@@ -1,3 +1,6 @@
+// add package
+// package LOAD_BALANCER_SERVER_CLIENT;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -5,8 +8,10 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Scanner;
 
+
+
 public class Client {
-    private static final int CHECK_INTERVAL_SECONDS = 2; // Adjust the interval as needed
+    private static final int CHECK_INTERVAL_SECONDS = 10; // Adjust the interval as needed
     private static String serverName = null; // Adjust the interval as needed
     private static  int port = -1; // Adjust the interval as needed
     private static Registry serverRegistry;
@@ -69,7 +74,7 @@ public class Client {
             
             serverCheckThread.start();
 
-            // Remaining client code remains the same...
+            
             Scanner scanner = new Scanner(System.in);
 
             while (true) {

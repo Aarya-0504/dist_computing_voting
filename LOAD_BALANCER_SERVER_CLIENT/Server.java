@@ -1,30 +1,48 @@
 // package LOAD_BALANCER_SERVER_CLIENT;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.time.Instant;
 import java.util.*;
-
-
-interface VotingInterface extends java.rmi.Remote {
-    String register_voter(String voterId) throws RemoteException;
-    String register_party(String partyName) throws RemoteException;
-    String vote(String voterId, String partyName) throws RemoteException;
-    Map<String, Integer> tally_votes() throws RemoteException;
-    Instant getServerTime() throws RemoteException;
-}
+import com.mongodb.ConnectionString;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 
 class VotingSystem implements VotingInterface {
     private Set<String> voters;
     private Map<String, Integer> parties;
+    private MongoCollection<Document> votersCollection;
+    private MongoCollection<Document> partiesCollection;
+
 
     public VotingSystem() {
         this.voters = new HashSet<>();
         this.parties = new HashMap<>();
-    }
+       
+            // Connect to MongoDB Atlas
+            String connectionString = "mongodb+srv://nikhilprajapati2:AT6QAz2cCfKKCOOI@cluster0.vzfozkt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tls=true";
+            MongoClient mongoClient = MongoClients.create(connectionString);
+            MongoDatabase database = mongoClient.getDatabase("DC_MINI_PROJECT");
+    
+            // Initialize collections
+            this.votersCollection = database.getCollection("registered_voters");
+            // this.partiesCollection = database.getCollection("parties");
+        }
+    
 
     public String register_voter(String voterId) throws RemoteException {
+ 
+        Document voter = votersCollection.find(new Document("voterId", voterId)).first();
+        if (voter != null) {
+            return "VoterId " + voterId + " exists, registration unsuccessful";
+        }
+        votersCollection.insertOne(new Document("voterId", voterId));
+
         if (voters.contains(voterId)) {
             return "VoterId " + voterId + " exist, registration unsuccessful";
         }
