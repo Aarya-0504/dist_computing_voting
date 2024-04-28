@@ -50,6 +50,14 @@ public class LoadBalancer implements LoadBalancerInterface {
             System.out.println("Server removed: " + serverName);
         }
     }
+    @Override
+    public boolean isServerActive(String serverName){
+        if (serverNames.contains(serverName)) {
+            return true;
+        }
+
+        return false;
+    }
 
     public static void main(String[] args) {
         new LoadBalancer();
