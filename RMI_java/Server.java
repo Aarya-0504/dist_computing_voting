@@ -3,11 +3,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.time.Instant;
-//import java.util.*;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.HashMap;
+import java.util.*;
+
+
 interface VotingInterface extends java.rmi.Remote {
     String register_voter(String voterId) throws RemoteException;
     String register_party(String partyName) throws RemoteException;
