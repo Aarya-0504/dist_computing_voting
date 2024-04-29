@@ -32,17 +32,19 @@ class VotingSystem implements VotingInterface {
     
             // Initialize collections
             this.votersCollection = database.getCollection("registered_voters");
-            // this.partiesCollection = database.getCollection("parties");
+            this.partiesCollection = database.getCollection("registered_parties");
         }
     
 
     public String register_voter(String voterId) throws RemoteException {
  
+        // mongodb table addition
         Document voter = votersCollection.find(new Document("voterId", voterId)).first();
         if (voter != null) {
             return "VoterId " + voterId + " exists, registration unsuccessful";
         }
         votersCollection.insertOne(new Document("voterId", voterId));
+        // mongodb table addition ends
 
         if (voters.contains(voterId)) {
             return "VoterId " + voterId + " exist, registration unsuccessful";
@@ -51,7 +53,18 @@ class VotingSystem implements VotingInterface {
         return "Voter " + voterId + " registered successfully";
     }
 
+
     public String register_party(String partyName) throws RemoteException {
+
+        //mongodb party name registeraton start
+        Document party = partiesCollection.find(new Document("partyName", partyName)).first();
+        if (party != null) {
+            return "party :  " + partyName + " already registered";
+        }
+        
+        partiesCollection.insertOne(new Document("partyName", partyName));
+        //mongodb party name registeraton end
+
         if (parties.containsKey(partyName)) {
             return "Party " + partyName + " already registered";
         }
