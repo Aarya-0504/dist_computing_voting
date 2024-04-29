@@ -9,6 +9,8 @@ public interface VotingInterface extends java.rmi.Remote {
     String register_voter(String voterId) throws RemoteException;
     String register_party(String partyName) throws RemoteException;
     String vote(String voterId, String partyName) throws RemoteException;
+    String  signup(String email,String username,String pass) throws RemoteException;
+    boolean  login(String email,String pass) throws RemoteException;
     Map<String, Integer> tally_votes() throws RemoteException;
     Instant getServerTime() throws RemoteException;
 

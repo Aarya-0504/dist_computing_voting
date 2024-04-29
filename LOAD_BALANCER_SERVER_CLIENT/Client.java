@@ -17,6 +17,10 @@ public class Client {
     private static Registry serverRegistry;
     private static VotingInterface stub;
     private static LoadBalancerInterface loadBalancer;
+    private static boolean isLoggedIn = false;
+    private static String loggedInUsername;
+    private static String passwordString;
+
 
     public static void main(String[] args) {
         try {
@@ -78,6 +82,38 @@ public class Client {
             Scanner scanner = new Scanner(System.in);
 
             while (true) {
+                
+                if (!isLoggedIn) {
+                    System.out.println("-------------------------------");
+                    System.out.println("Voting System");
+                    System.out.println("-------------------------------");
+                    System.out.println("1. Signup");
+                    System.out.println("2. Login");
+                    System.out.println("0. Exit");
+                    System.out.println("-------------------------------");
+
+                    System.out.print("\nEnter your choice: ");
+                    String authChoice = scanner.nextLine();
+
+                    switch (authChoice) {
+                        case "1":
+                            performSignup(scanner,stub);
+                            break;
+                        case "2":
+                            isLoggedIn = performLogin(scanner, stub);
+                            break;
+                        case "0":
+                            System.out.println("Exiting...\n");
+                            System.exit(0);
+                            // return;
+                        default:
+                            System.out.println("Invalid choice! Please try again!");
+                            break;
+                    }
+                } 
+                 
+                else{
+
                 System.out.println("\n-------------------------------");
                 System.out.println("Voting Machine");
                 System.out.println("-------------------------------");
@@ -123,13 +159,15 @@ public class Client {
 
                     case "0":
                         System.out.println("Exiting...\n");
-                        return;
+                        System.exit(0);
+                        // return;
 
                     default:
                         System.out.println("Invalid choice! Please try again!");
                         break;
                 }
-
+                
+                }
 
                 if (serverName == null) {
                     System.out.println("No servers available. Exiting...");
@@ -144,4 +182,71 @@ public class Client {
 
         
     }
+
+    private static void performSignup(Scanner scanner,VotingInterface stub) {
+        System.out.println("-------------------------------");
+        System.out.println("Welcome to Voting System Signup");
+        System.out.println("-------------------------------");
+        System.out.print("Enter email: ");
+        String email = scanner.nextLine();
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = readPasswordFromConsole();
+        passwordString=password;
+        
+        try{
+            String ans=stub.signup(email,username,password);
+            if(ans.split(" ")[0].equals("true"))
+                System.out.println("Signup successful! Please login to proceed.");
+            else
+            System.out.println("User already Exists");
+        }
+
+        catch (Exception e) {
+            System.err.println("RemoteException occurred: " + e.getMessage());
+        }
+    }
+
+    private static boolean performLogin(Scanner scanner,VotingInterface stub) {
+        System.out.println("-------------------------------");
+        System.out.println("Login");
+        System.out.println("-------------------------------");
+        System.out.print("Enter email: ");
+        String email = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = readPasswordFromConsole(); 
+
+        try{
+
+            if (stub.login(email,password)) {
+    
+                System.out.println("Login successful! Welcome");
+                return true;
+            } else {
+                System.out.println("Invalid email or password. Please try again!");
+                return false;
+            }
+        }
+        catch(Exception e){
+            System.err.println("RemoteException occurred: " + e.getMessage());
+        }
+
+    return false;
+    }
+
+
+    private static String readPasswordFromConsole() {
+        if (System.console() != null) {
+        
+            return new String(System.console().readPassword());
+        } else {
+        
+            Scanner scanner = new Scanner(System.in);
+            return scanner.nextLine();
+        }
+    }
+
+
+
 }

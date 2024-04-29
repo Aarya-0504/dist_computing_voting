@@ -13,12 +13,13 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 
-class VotingSystem implements VotingInterface {
+class VotingSystem implements VotingInterface 
+{
     private Set<String> voters;
     private Map<String, Integer> parties;
     private MongoCollection<Document> votersCollection;
     private MongoCollection<Document> partiesCollection;
-
+    private MongoCollection<Document> usersCollection;
 
     public VotingSystem() {
         this.voters = new HashSet<>();
@@ -33,6 +34,7 @@ class VotingSystem implements VotingInterface {
             // Initialize collections
             this.votersCollection = database.getCollection("registered_voters");
             this.partiesCollection = database.getCollection("registered_parties");
+            this.usersCollection = database.getCollection("users");
         }
     
 
@@ -91,7 +93,23 @@ class VotingSystem implements VotingInterface {
     public Instant getServerTime() throws RemoteException {
         return Instant.now();
     }
+
+    public String signup(String email, String username, String pass) throws RemoteException {
+        Document user = usersCollection.find(new Document("email", email)).first();
+        if (user != null) {
+            return "false "+"User Already Exists"; // User already exists
+        }
+        usersCollection.insertOne(new Document("email", email).append("username", username).append("password", pass));
+        return "true "+"User Registered Successfully"; // Signup successful
+    }
+
+    public boolean login(String email, String pass) throws RemoteException {
+        Document user = usersCollection.find(new Document("email", email).append("password", pass)).first();
+        return user != null; // Return true if user exists with given email and password
+    }
 }
+
+
 
 
 public class Server {
