@@ -26,7 +26,7 @@ class VotingSystem implements VotingInterface {
         String pass = System.getenv("CLUSTER_PASSOWRD");
 
             // Connect to MongoDB Atlas
-            String connectionString = "mongodb+srv://nikhilprajapati2:"+pass+"@cluster0.vzfozkt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tls=true";
+            String connectionString = "mongodb+srv://nikhilprajapati2:AT6QAz2cCfKKCOOI@cluster0.vzfozkt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tls=true";
             MongoClient mongoClient = MongoClients.create(connectionString);
             MongoDatabase database = mongoClient.getDatabase("DC_MINI_PROJECT");
     
