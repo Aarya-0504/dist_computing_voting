@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Admin {
-
+    
     private static MongoClient mongoClient;
     private static MongoDatabase database;
     private static MongoCollection<Document> collection;
