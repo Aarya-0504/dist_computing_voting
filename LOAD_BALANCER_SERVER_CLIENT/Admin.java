@@ -12,7 +12,7 @@ public class Admin {
 
     public static void main(String[] args) {
         // Create a MongoDB client
-        String pass = System.getenv("CLUSTER_PASSOWRD");
+        // String pass = System.getenv("CLUSTER_PASSOWRD");
 
         // Connect to MongoDB Atlas
         String connectionString = "mongodb+srv://nikhilprajapati2:AT6QAz2cCfKKCOOI@cluster0.vzfozkt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tls=true";
@@ -21,7 +21,10 @@ public class Admin {
         MongoCollection<Document> collection = database.getCollection("elections");
         // Scanner for user input
         Scanner scanner = new Scanner(System.in);
-
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println("------------------Welcome to the Election Management System----------------------");
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println("Please enter the following details to register an election:");
         // Input election ID
         System.out.print("Enter Election ID: ");
         String electionId = scanner.nextLine();
@@ -37,22 +40,14 @@ public class Admin {
             registeredParties.add(partyName);
         }
 
-        // Input party status
-        List<Boolean> partyStatus = new ArrayList<>();
-        for (String party : registeredParties) {
-            System.out.print("Is Party " + party + " active? (true/false): ");
-            boolean isActive = scanner.nextBoolean();
-            partyStatus.add(isActive);
-        }
-
         // Create a document to store election data
         Document electionDocument = new Document("electionId", electionId)
                 .append("registeredParties", registeredParties)
-                .append("partyStatus", partyStatus);
+                .append("election_Status", true);
 
         // Insert the document into the collection
         collection.insertOne(electionDocument);
-
+        
         // Close the scanner and MongoDB client
         scanner.close();
         mongoClient.close();
