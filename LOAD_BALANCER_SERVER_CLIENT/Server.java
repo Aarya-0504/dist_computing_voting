@@ -10,8 +10,13 @@ import com.mongodb.ConnectionString;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.bson.types.ObjectId;
+
+import java.util.logging.*;
 
 class VotingSystem implements VotingInterface 
 {
@@ -20,14 +25,16 @@ class VotingSystem implements VotingInterface
     private MongoCollection<Document> votersCollection;
     private MongoCollection<Document> partiesCollection;
     private MongoCollection<Document> usersCollection;
+    private MongoCollection<Document> electionCollection;
 
     public VotingSystem() {
         this.voters = new HashSet<>();
         this.parties = new HashMap<>();
-        // String pass = System.getenv("CLUSTER_PASSOWRD");
-        
+        String connectionString = "mongodb+srv://nikhilprajapati2:AT6QAz2cCfKKCOOI@cluster0.vzfozkt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tls=true";
+        Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
+        mongoLogger.setLevel(Level.SEVERE);
+
             // Connect to MongoDB Atlas
-            String connectionString = "mongodb+srv://nikhilprajapati2:AT6QAz2cCfKKCOOI@cluster0.vzfozkt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tls=true";
             MongoClient mongoClient = MongoClients.create(connectionString);
             MongoDatabase database = mongoClient.getDatabase("DC_MINI_PROJECT");
     
@@ -35,6 +42,7 @@ class VotingSystem implements VotingInterface
             this.votersCollection = database.getCollection("registered_voters");
             this.partiesCollection = database.getCollection("registered_parties");
             this.usersCollection = database.getCollection("users");
+            this.electionCollection = database.getCollection("elections");
         }
     
 
@@ -74,21 +82,66 @@ class VotingSystem implements VotingInterface
         return "Party " + partyName + " registered successfully";
     }
 
-    public String vote(String voterId, String partyName) throws RemoteException {
-        if (!voters.contains(voterId)) {
-            return "Voter not registered";
-        }
-        if (!parties.containsKey(partyName)) {
-            return "Party not registered";
-        }
-        parties.put(partyName, parties.get(partyName) + 1);
-        voters.remove(voterId);
-        return "Vote cast for " + partyName + " successfully";
+ 
+ public String vote(String voterId, String partyName, String electionId) throws RemoteException {
+    
+    Document electionFilter = new Document("electionId", electionId);
+    Document existingElection = electionCollection.find(electionFilter).first();
+    if (existingElection == null) {
+        System.out.println("No election found with ID: " + electionId);
+        return "No election found with ID: " + electionId;
     }
+
+    // Update the 'votersVoted' array in the existing election document
+    List<String> votersVoted = existingElection.getList("votersVoted", String.class);
+    if (votersVoted == null) {
+        votersVoted = new ArrayList<>();
+    }
+    if (!votersVoted.contains(voterId)) {
+        votersVoted.add(voterId);
+        electionCollection.updateOne(electionFilter, new Document("$set", new Document("votersVoted", votersVoted)));
+    } else {
+        return "Voter " + voterId + " has already voted in election " + electionId;
+    }
+
+    // Update the 'partyVotes' count in the existing election document
+    String partyVotesKey = "partyVotes." + partyName;
+    Integer partyVotesCount = existingElection.getInteger(partyVotesKey, 0);
+    partyVotesCount++;
+    electionCollection.updateOne(electionFilter, new Document("$set", new Document(partyVotesKey, partyVotesCount)));
+
+    // System.out.println("Vote successfully cast for " + partyName + " in election " + electionId);
+    return "Vote successfully cast for " + partyName + " in election " + electionId;
+}
 
     public Map<String, Integer> tally_votes() throws RemoteException {
         return parties;
     }
+
+    public Map<String, Integer> tally_votes(String electionId) throws RemoteException {
+        
+        Map<String, Integer> voteCounts = new HashMap<>();
+
+        
+        Document electionDoc = electionCollection.find(new Document("electionId", electionId)).first();
+
+        if (electionDoc == null) {
+            
+            return null;
+        }
+
+        // Get the partyVotes field from the document
+        Document partyVotes = electionDoc.get("partyVotes", Document.class);
+
+        // Iterate through the partyVotes and add the counts to the voteCounts map
+        for (String partyName : partyVotes.keySet()) {
+            int count = partyVotes.getInteger(partyName);
+            voteCounts.put(partyName, count);
+        }
+
+        return voteCounts;
+    }
+
 
     public Instant getServerTime() throws RemoteException {
         return Instant.now();
@@ -103,10 +156,37 @@ class VotingSystem implements VotingInterface
         return "true "+"User Registered Successfully"; // Signup successful
     }
 
-    public boolean login(String email, String pass) throws RemoteException {
+    public String login(String email, String pass) throws RemoteException {
         Document user = usersCollection.find(new Document("email", email).append("password", pass)).first();
-        return user != null; // Return true if user exists with given email and password
+
+        if (user != null) {
+            ObjectId userId = user.getObjectId("_id");
+            return userId.toHexString(); // Return _id as a String
+        }
+    
+        return null; // Return null if user is not found
     }
+
+    public Map<String, Object> fetchElectionDetail() throws RemoteException {
+        // Query MongoDB collection for the latest active election
+        Document election = electionCollection.find(
+            Filters.eq("election_Status", true)
+        ).sort(Sorts.descending("timestamp")).first();
+        
+        if (election != null) {
+            // Convert the Document to a Map<String, Object>
+            Map<String, Object> electionDetailMap = new HashMap<>();
+            electionDetailMap.put("electionId", election.getString("electionId"));
+            electionDetailMap.put("registeredParties", election.get("registeredParties", List.class));
+            electionDetailMap.put("election_Status", election.getBoolean("election_Status"));
+
+            return electionDetailMap;
+        } else {
+            // No active election found
+            return null;
+        }
+    }
+
 }
 
 
