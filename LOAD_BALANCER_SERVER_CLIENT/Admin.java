@@ -1,49 +1,60 @@
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Admin {
-    private static LoadBalancerInterface loadBalancer;
 
     public static void main(String[] args) {
-        try {
-            Registry registry = LocateRegistry.getRegistry("localhost", 3000);
-            loadBalancer = (LoadBalancerInterface) registry.lookup("LoadBalancer");
+        // Create a MongoDB client
+        String pass = System.getenv("CLUSTER_PASSOWRD");
 
-            // Get the server name and port from the load balancer
-            String serverName = loadBalancer.getServerName();
-            String[] parts = serverName.split(" ");
-            int port = Integer.parseInt(parts[1]);
-
-            System.out.println("Connected to server: " + serverName);
-
-            // Connect to the server
-            Registry serverRegistry = LocateRegistry.getRegistry("localhost", port);
-            VotingInterface stub = (VotingInterface) serverRegistry.lookup(serverName);
-
-            // Add voting details by admin
-            addVotingDetails(stub);
-
-        } catch (Exception e) {
-            System.err.println("Admin client exception: " + e.toString());
-            e.printStackTrace();
-        }
-    }
-
-    private static void addVotingDetails(VotingInterface stub) throws RemoteException {
+        // Connect to MongoDB Atlas
+        String connectionString = "mongodb+srv://nikhilprajapati2:AT6QAz2cCfKKCOOI@cluster0.vzfozkt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&tls=true";
+        MongoClient mongoClient = MongoClients.create(connectionString);
+        MongoDatabase database = mongoClient.getDatabase("DC_MINI_PROJECT");
+        MongoCollection<Document> collection = database.getCollection("elections");
+        // Scanner for user input
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Enter voting details:");
-        System.out.print("Voting ID: ");
-        String votingId = scanner.nextLine();
-        System.out.print("Voting Name: ");
-        String votingName = scanner.nextLine();
-        System.out.print("Voting Description: ");
-        String votingDescription = scanner.nextLine();
+        // Input election ID
+        System.out.print("Enter Election ID: ");
+        String electionId = scanner.nextLine();
 
-        // Call the method on the server to add voting details
-        String response = stub.addVotingDetails(votingId, votingName, votingDescription);
-        System.out.println("Response from server: " + response);
+        // Input parties
+        List<String> registeredParties = new ArrayList<>();
+        while (true) {
+            System.out.print("Enter Party Name (or type 'done' to finish): ");
+            String partyName = scanner.nextLine();
+            if (partyName.equalsIgnoreCase("done")) {
+                break;
+            }
+            registeredParties.add(partyName);
+        }
+
+        // Input party status
+        List<Boolean> partyStatus = new ArrayList<>();
+        for (String party : registeredParties) {
+            System.out.print("Is Party " + party + " active? (true/false): ");
+            boolean isActive = scanner.nextBoolean();
+            partyStatus.add(isActive);
+        }
+
+        // Create a document to store election data
+        Document electionDocument = new Document("electionId", electionId)
+                .append("registeredParties", registeredParties)
+                .append("partyStatus", partyStatus);
+
+        // Insert the document into the collection
+        collection.insertOne(electionDocument);
+
+        // Close the scanner and MongoDB client
+        scanner.close();
+        mongoClient.close();
     }
 }
