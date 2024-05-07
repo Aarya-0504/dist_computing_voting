@@ -15,7 +15,7 @@ Open a command prompt and start the RMI registry by running the following comman
 ### Step 2: Compile Class Files
 
 Compile all class files using the following command. Make sure to include the MongoDB Java driver JAR file (`mongo-java-driver-3.12.14.jar`) in the classpath.
-Command : javac -cp ".;mongo-java-driver-3.12.14.jar" *.java
+Command : javac -cp ".;lib/mongo-java-driver-3.12.14.jar" *.java
 
 ### Step 3: Run Load Balancer
 
@@ -23,7 +23,7 @@ Start the load balancer by running the following command: *java LoadBalancer*
 
 ### Step 4: Run Server
 
-Run the server, specifying the port. For example: *java -cp ".;mongo-java-driver-3.12.14.jar" Server 1100*
+Run the server, specifying the port. For example: *java -cp ".;lib/mongo-java-driver-3.12.14.jar" Server 1100*
 
 Make sure to include the MongoDB Java driver JAR file (`mongo-java-driver-3.12.14.jar`) in the classpath.
 
