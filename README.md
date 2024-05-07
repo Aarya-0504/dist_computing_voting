@@ -34,6 +34,10 @@ Finally, run the client application using the following command: *java Client*
 ## Contributors
 
 - [Nikhil Prajapati](https://github.com/nik-prajapti)
+- [Aarya Patil](https://github.com/Aarya-0504)
+- [Ronit Mankani](https://github.com/Ronit0987)
+- [Harshvardhan Pawar](https://github.com/Hbp48)
+
 
 
 
